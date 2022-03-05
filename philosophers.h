@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ael-hadd <ael-hadd@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: aourhzal <aourhzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/02/24 10:01:57 by ael-hadd          #+#    #+#             */
-/*   Updated: 2022/03/05 12:55:29 by ael-hadd         ###   ########.fr       */
+/*   Created: 2022/02/24 10:01:57 by aourhzal          #+#    #+#             */
+/*   Updated: 2022/03/05 13:11:05 by aourhzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,12 +34,6 @@ typedef struct s_time
 	int				s_eat;
 }	t_time;
 
-typedef struct s_fork
-{
-	pthread_mutex_t	fork;
-	int				state;
-}	t_fork;
-
 typedef struct s_philo
 {
 	int				philo_id;
@@ -50,9 +44,7 @@ typedef struct s_philo
 	long			reset;
 	t_time			times;
 	pthread_mutex_t	*l_fork;
-	int				*l_fork_state;
 	pthread_mutex_t	*r_fork;
-	int				*r_fork_state;
 	pthread_mutex_t	*print;
 }	t_philo;
 
@@ -60,7 +52,7 @@ typedef struct s_philosophers
 {
 	t_philo			*ph;
 	int				state;
-	t_fork			*forks;
+	pthread_mutex_t	*forks;
 	int				num_of_philo;
 	pthread_mutex_t	print;
 	t_time			time;

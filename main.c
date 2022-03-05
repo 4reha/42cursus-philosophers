@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ael-hadd <ael-hadd@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: aourhzal <aourhzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/02/24 10:01:12 by ael-hadd          #+#    #+#             */
-/*   Updated: 2022/03/05 12:55:29 by ael-hadd         ###   ########.fr       */
+/*   Created: 2022/02/24 10:01:12 by aourhzal          #+#    #+#             */
+/*   Updated: 2022/03/05 13:17:47 by aourhzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@ void	*death_caller(void *arg)
 	int		i;
 
 	ph = arg;
-	
 	while (1)
 	{
 		i = -1;
@@ -38,7 +37,7 @@ void	*death_caller(void *arg)
 	}
 }
 
-int	threading_part2(t_philosophers *philosophers, int i, pthread_t	*thread)
+int	threading_part2(t_philosophers *philosophers, pthread_t	*thread)
 {
 	int	i;
 
@@ -47,16 +46,16 @@ int	threading_part2(t_philosophers *philosophers, int i, pthread_t	*thread)
 	{
 		philosophers->ph[i].times = philosophers->time;
 		philosophers->ph[i].philo_id = i + 1;
-		philosophers->ph[i].l_fork = &philosophers->forks[i].fork;
+		philosophers->ph[i].l_fork = &philosophers->forks[i];
 		philosophers->ph[i].r_fork = &philosophers->forks[(i + 1)
-			% philosophers->num_of_philo].fork;
+			% philosophers->num_of_philo];
 		philosophers->state = ALIVE;
 		philosophers->ph[i].start = current_time();
 		philosophers->ph[i].reset = philosophers->ph[i].start;
 		philosophers->ph[i].state = &philosophers->state;
 		philosophers->ph[i].print = &philosophers->print;
 		philosophers->ph[i].num_of_mfks = &philosophers->num_of_philo;
-		if (!pthread_create(&thread[i], NULL, &routine,
+		if (pthread_create(&thread[i], NULL, &routine,
 				(void *)(&philosophers->ph[i])))
 			return (0);
 	}
@@ -70,15 +69,15 @@ int	threading(t_philosophers *philosophers)
 	pthread_t	death;
 
 	i = -1;
-	thread = (philosophers->num_of_philo * sizeof(pthread_t));
+	thread = malloc(philosophers->num_of_philo * sizeof(pthread_t));
 	philosophers->forks = malloc
 		(philosophers->num_of_philo * sizeof(pthread_mutex_t));
 	if (!thread || !philosophers->forks)
 		return (0);
 	while (++i < philosophers->num_of_philo)
-		pthread_mutex_init(&philosophers->forks[i].fork, NULL);
-	threading_part2(philosophers, i, thread);
-	if (!pthread_create(&death, NULL, death_caller, (void *)philosophers->ph))
+		pthread_mutex_init(&philosophers->forks[i], NULL);
+	threading_part2(philosophers, thread);
+	if (pthread_create(&death, NULL, death_caller, (void *)philosophers->ph))
 		return (0);
 	i = -1;
 	while (++i < philosophers->num_of_philo)
