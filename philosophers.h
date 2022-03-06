@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aourhzal <aourhzal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ael-hadd <ael-hadd@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/02/24 10:01:57 by aourhzal          #+#    #+#             */
-/*   Updated: 2022/03/05 13:11:05 by aourhzal         ###   ########.fr       */
+/*   Created: 2022/02/24 10:01:57 by ael-hadd          #+#    #+#             */
+/*   Updated: 2022/03/06 13:57:01 by ael-hadd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@ typedef struct s_philo
 	int				*state;
 	int				*num_of_mfks;
 	long			start;
-	long			end;
 	long			reset;
 	t_time			times;
 	pthread_mutex_t	*l_fork;
@@ -50,6 +49,7 @@ typedef struct s_philo
 
 typedef struct s_philosophers
 {
+	pthread_t		*thread;
 	t_philo			*ph;
 	int				state;
 	pthread_mutex_t	*forks;
@@ -58,10 +58,18 @@ typedef struct s_philosophers
 	t_time			time;
 }	t_philosophers;
 
-int		ft_atoi(const char *nptr);
-void	*routine(void *philo_arg);
 long	current_time(void);
-void	ft_putstr(char *str);
-void	ft_putnbr(long long nn);
+void	*routine(void *philo_arg);
+
+int		ft_atoi(const char *nptr);
+void	print_header(void);
+void	print_log(long time, int philo_id, char *action, int x);
+
+int		ft_error(char	*msg);
+int		arg_checker(t_philosophers *philosophers);
+int		usage(void);
+
+int		end_threading(t_philosophers philosophers);
+int		ft_free(t_philosophers philosophers);
 
 #endif

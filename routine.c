@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: ael-hadd <ael-hadd@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/02/24 10:55:01 by aourhzal          #+#    #+#             */
-/*   Updated: 2022/03/05 09:25:58 by ael-hadd         ###   ########.fr       */
+/*   Created: 2022/02/24 10:55:01 by ael-hadd          #+#    #+#             */
+/*   Updated: 2022/03/06 14:39:50 by ael-hadd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,7 @@ void	thinking(t_philo	*philo)
 				- (current_time() - philo->reset)) / 3) * 2;
 	pthread_mutex_lock(philo->print);
 	if (*philo->state == ALIVE)
-		printf("in %.4ld philo %d is thinking\n",
-			(current_time() - philo->start), philo->philo_id);
+		print_log(philo->start, philo->philo_id, "  is thinking   ", 1);
 	pthread_mutex_unlock(philo->print);
 	if (*philo->state == ALIVE)
 		usleep(philo->times.to_think * 1000);
@@ -39,8 +38,7 @@ void	sleeping(t_philo	*philo)
 {
 	pthread_mutex_lock(philo->print);
 	if (*philo->state == ALIVE)
-		printf("in %.4ld philo %d is sleeping\n",
-			(current_time() - philo->start), philo->philo_id);
+		print_log(philo->start, philo->philo_id, "  is sleeping   ", 1);
 	pthread_mutex_unlock(philo->print);
 	if (*philo->state == ALIVE)
 		usleep(philo->times.to_sleep * 1000);
@@ -56,13 +54,13 @@ void	eating(t_philo	*philo, int *stop)
 	}
 	pthread_mutex_lock(philo->l_fork);
 	if (*philo->state == ALIVE)
-		printf("in %.4ld philo %d has taken a fork\n",
-			(current_time() - philo->start), philo->philo_id);
+		print_log(philo->start, philo->philo_id, "has taken a fork", 1);
 	pthread_mutex_lock(philo->r_fork);
+	if (*philo->state == ALIVE)
+		print_log(philo->start, philo->philo_id, "has taken a fork", 1);
 	pthread_mutex_lock(philo->print);
 	if (*philo->state == ALIVE)
-		printf("in %.4ld philo %d is eating\n",
-			(current_time() - philo->start), philo->philo_id);
+		print_log(philo->start, philo->philo_id, "   is eating    ", 1);
 	pthread_mutex_unlock(philo->print);
 	philo->reset = current_time();
 	if (*philo->state == ALIVE)
@@ -71,6 +69,7 @@ void	eating(t_philo	*philo, int *stop)
 		usleep(philo->times.to_eat * 500);
 	pthread_mutex_unlock(philo->l_fork);
 	pthread_mutex_unlock(philo->r_fork);
+	philo->times.s_eat--;
 }
 
 void	*routine(void *philo_arg)
