@@ -6,7 +6,7 @@
 /*   By: ael-hadd <ael-hadd@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/24 10:01:12 by ael-hadd          #+#    #+#             */
-/*   Updated: 2022/03/06 14:00:21 by ael-hadd         ###   ########.fr       */
+/*   Updated: 2022/03/08 10:39:57 by ael-hadd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,20 +21,21 @@ void	*death_caller(void *arg)
 	while (1)
 	{
 		i = -1;
-		while (++i < *ph[0].num_of_mfks)
+		while (++i < ph[0].num_of_mfks)
 		{
 			if (current_time() - ph[i].reset > ph[i].times.to_die)
 			{
 				*ph[i].state = DEAD;
-				pthread_mutex_lock(ph[i].print);
-				print_log(ph[i].start, ph[i].philo_id, "   just died    ", 0);
-				pthread_mutex_unlock(ph[i].print);
-				if (*ph[i].num_of_mfks == 1)
+				print_log(ph[i].start, ph[i].philo_id, "just died", 0);
+				if (ph[i].num_of_mfks == 1)
 					pthread_mutex_unlock(ph[i].l_fork);
 				return (NULL);
 			}
 		}
+		if (*ph[0].mfks_count != ph[0].num_of_mfks)
+			return (NULL);
 	}
+	return (NULL);
 }
 
 int	threading_part2(t_philosophers *philosophers)
@@ -53,8 +54,8 @@ int	threading_part2(t_philosophers *philosophers)
 		philosophers->ph[i].start = current_time();
 		philosophers->ph[i].reset = philosophers->ph[i].start;
 		philosophers->ph[i].state = &philosophers->state;
-		philosophers->ph[i].print = &philosophers->print;
-		philosophers->ph[i].num_of_mfks = &philosophers->num_of_philo;
+		philosophers->ph[i].num_of_mfks = philosophers->num_of_philo;
+		philosophers->ph[i].mfks_count = &philosophers->num_of_philo;
 		if (pthread_create(&philosophers->thread[i], NULL, &routine,
 				(void *)(&philosophers->ph[i])))
 			return (1);
@@ -77,7 +78,6 @@ int	threading(t_philosophers *philosophers)
 		return (1);
 	while (++i < philosophers->num_of_philo)
 		pthread_mutex_init(&philosophers->forks[i], NULL);
-	pthread_mutex_init(&philosophers->print, NULL);
 	if (threading_part2(philosophers))
 		return (ft_error("Cannot create philo thread!"));
 	if (pthread_create(&death, NULL, death_caller, (void *)philosophers->ph))

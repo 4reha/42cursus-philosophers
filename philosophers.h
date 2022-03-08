@@ -6,7 +6,7 @@
 /*   By: ael-hadd <ael-hadd@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/24 10:01:57 by ael-hadd          #+#    #+#             */
-/*   Updated: 2022/03/06 13:57:01 by ael-hadd         ###   ########.fr       */
+/*   Updated: 2022/03/08 10:39:33 by ael-hadd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,13 +38,13 @@ typedef struct s_philo
 {
 	int				philo_id;
 	int				*state;
-	int				*num_of_mfks;
+	int				num_of_mfks;
+	int				*mfks_count;
 	long			start;
 	long			reset;
 	t_time			times;
 	pthread_mutex_t	*l_fork;
 	pthread_mutex_t	*r_fork;
-	pthread_mutex_t	*print;
 }	t_philo;
 
 typedef struct s_philosophers
@@ -54,7 +54,6 @@ typedef struct s_philosophers
 	int				state;
 	pthread_mutex_t	*forks;
 	int				num_of_philo;
-	pthread_mutex_t	print;
 	t_time			time;
 }	t_philosophers;
 
@@ -64,6 +63,7 @@ void	*routine(void *philo_arg);
 int		ft_atoi(const char *nptr);
 void	print_header(void);
 void	print_log(long time, int philo_id, char *action, int x);
+void	print_footer(void);
 
 int		ft_error(char	*msg);
 int		arg_checker(t_philosophers *philosophers);
@@ -71,5 +71,7 @@ int		usage(void);
 
 int		end_threading(t_philosophers philosophers);
 int		ft_free(t_philosophers philosophers);
+
+void	ft_usleep(int ms);
 
 #endif

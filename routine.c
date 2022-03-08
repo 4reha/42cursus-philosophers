@@ -6,51 +6,18 @@
 /*   By: ael-hadd <ael-hadd@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/24 10:55:01 by ael-hadd          #+#    #+#             */
-/*   Updated: 2022/03/06 14:39:50 by ael-hadd         ###   ########.fr       */
+/*   Updated: 2022/03/07 14:51:46 by ael-hadd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-long	current_time(void)
+void	takes_fork(t_philo	*philo, int *stop)
 {
-	struct timeval	time;
-	long			total;
-
-	gettimeofday(&time, NULL);
-	total = time.tv_sec * 1000 + time.tv_usec / 1000;
-	return (total);
-}
-
-void	thinking(t_philo	*philo)
-{
-	philo->times.to_think = ((philo->times.to_die
-				- (current_time() - philo->reset)) / 3) * 2;
-	pthread_mutex_lock(philo->print);
-	if (*philo->state == ALIVE)
-		print_log(philo->start, philo->philo_id, "  is thinking   ", 1);
-	pthread_mutex_unlock(philo->print);
-	if (*philo->state == ALIVE)
-		usleep(philo->times.to_think * 1000);
-}
-
-void	sleeping(t_philo	*philo)
-{
-	pthread_mutex_lock(philo->print);
-	if (*philo->state == ALIVE)
-		print_log(philo->start, philo->philo_id, "  is sleeping   ", 1);
-	pthread_mutex_unlock(philo->print);
-	if (*philo->state == ALIVE)
-		usleep(philo->times.to_sleep * 1000);
-}
-
-void	eating(t_philo	*philo, int *stop)
-{
-	(void)stop;
 	if (philo->philo_id % 2 == 1 && *stop == 0)
 	{
 		*stop += 1;
-		usleep(philo->times.to_eat);
+		ft_usleep(philo->times.to_eat);
 	}
 	pthread_mutex_lock(philo->l_fork);
 	if (*philo->state == ALIVE)
@@ -58,18 +25,42 @@ void	eating(t_philo	*philo, int *stop)
 	pthread_mutex_lock(philo->r_fork);
 	if (*philo->state == ALIVE)
 		print_log(philo->start, philo->philo_id, "has taken a fork", 1);
-	pthread_mutex_lock(philo->print);
+}
+
+void	thinking(t_philo	*philo)
+{
 	if (*philo->state == ALIVE)
-		print_log(philo->start, philo->philo_id, "   is eating    ", 1);
-	pthread_mutex_unlock(philo->print);
-	philo->reset = current_time();
+		print_log(philo->start, philo->philo_id, "is thinking", 1);
+}
+
+void	sleeping(t_philo	*philo)
+{
 	if (*philo->state == ALIVE)
-		usleep(philo->times.to_eat * 500);
+		print_log(philo->start, philo->philo_id, "is sleeping", 1);
 	if (*philo->state == ALIVE)
-		usleep(philo->times.to_eat * 500);
+		ft_usleep(philo->times.to_sleep);
+}
+
+void	eating(t_philo	*philo)
+{
+	int	i;
+
+	i = 1;
+	if (*philo->state == ALIVE)
+	{
+		philo->times.s_eat--;
+		if (philo->times.s_eat == 0)
+		{
+			*philo->mfks_count -= 1;
+			if (*philo->mfks_count == 0)
+				i = 0;
+		}
+		print_log(philo->start, philo->philo_id, "is eating", i);
+		philo->reset = current_time();
+		ft_usleep(philo->times.to_eat);
+	}
 	pthread_mutex_unlock(philo->l_fork);
 	pthread_mutex_unlock(philo->r_fork);
-	philo->times.s_eat--;
 }
 
 void	*routine(void *philo_arg)
@@ -81,9 +72,12 @@ void	*routine(void *philo_arg)
 	stop = 0;
 	while (1)
 	{
-		if (*philo->state == DEAD || philo->times.s_eat == 0)
+		if (*philo->state == DEAD)
 			break ;
-		eating(philo, &stop);
+		takes_fork(philo, &stop);
+		eating(philo);
+		if (philo->times.s_eat == 0)
+			break ;
 		if (*philo->state == DEAD)
 			break ;
 		sleeping(philo);
